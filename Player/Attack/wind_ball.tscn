@@ -1,0 +1,29 @@
+[gd_scene load_steps=4 format=3 uid="uid://bttcdhc8ddi8g"]
+
+[ext_resource type="Texture2D" uid="uid://b8qhuhxtxabfr" path="res://MC Cewe/MC Cewe (attack Basic)-Sheet.png" id="1_prp1u"]
+[ext_resource type="Script" path="res://Player/Attack/wind_ball.gd" id="1_s28la"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_uq0ud"]
+radius = 15.1327
+
+[node name="WindBall" type="Area2D"]
+script = ExtResource("1_s28la")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(-4.25, -2.25)
+scale = Vector2(0.672222, 0.672222)
+texture = ExtResource("1_prp1u")
+hframes = 10
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-4, 0)
+shape = SubResource("CircleShape2D_uq0ud")
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 10.0
+one_shot = true
+autostart = true
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

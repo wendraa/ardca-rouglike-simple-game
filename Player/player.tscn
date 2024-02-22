@@ -1,0 +1,126 @@
+[gd_scene load_steps=11 format=3 uid="uid://bxtre2y8xd7s6"]
+
+[ext_resource type="Script" path="res://Player/player.gd" id="1_f2bg4"]
+[ext_resource type="Texture2D" uid="uid://dv8j1nvqnp6ae" path="res://MC Cewe/MC Cewe (idle)-Sheet.png" id="2_x5xf0"]
+[ext_resource type="PackedScene" uid="uid://dmhkrv8fdhm7k" path="res://Utility/hurt_box.tscn" id="3_afbq6"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_kccem"]
+radius = 8.0
+height = 38.0
+
+[sub_resource type="Animation" id="Animation_pv78t"]
+resource_name = "idle"
+length = 0.5
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("coRun:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4]
+}
+
+[sub_resource type="Animation" id="Animation_hjrhs"]
+length = 0.001
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("coRun:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_qo432"]
+resource_name = "walk"
+length = 0.64
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("coRun:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [5, 6, 7, 8, 9, 10, 11]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ma7fl"]
+_data = {
+"RESET": SubResource("Animation_hjrhs"),
+"idle": SubResource("Animation_pv78t"),
+"walk": SubResource("Animation_qo432")
+}
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_boj01"]
+size = Vector2(19, 30)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_0grm2"]
+radius = 370.022
+
+[node name="Player" type="CharacterBody2D" groups=["player"]]
+motion_mode = 1
+script = ExtResource("1_f2bg4")
+
+[node name="coRun" type="Sprite2D" parent="."]
+position = Vector2(-1, 0)
+texture = ExtResource("2_x5xf0")
+hframes = 12
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-3, -4)
+shape = SubResource("CapsuleShape2D_kccem")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_ma7fl")
+}
+
+[node name="HurtBox" parent="." instance=ExtResource("3_afbq6")]
+collision_layer = 2
+collision_mask = 2
+
+[node name="CollisionShape2D" parent="HurtBox" index="0"]
+position = Vector2(-2.5, -3)
+shape = SubResource("RectangleShape2D_boj01")
+
+[node name="Attack" type="Node2D" parent="."]
+
+[node name="WindBallTimer" type="Timer" parent="Attack"]
+unique_name_in_owner = true
+wait_time = 1.5
+
+[node name="WindBallAttackTimer" type="Timer" parent="Attack/WindBallTimer"]
+unique_name_in_owner = true
+wait_time = 0.075
+
+[node name="EnemyDetectionArea" type="Area2D" parent="."]
+collision_layer = 4
+collision_mask = 4
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyDetectionArea"]
+shape = SubResource("CircleShape2D_0grm2")
+
+[connection signal="hurt" from="HurtBox" to="." method="_on_hurt_box_hurt"]
+[connection signal="timeout" from="Attack/WindBallTimer" to="." method="_on_wind_ball_timer_timeout"]
+[connection signal="timeout" from="Attack/WindBallTimer/WindBallAttackTimer" to="." method="_on_wind_ball_attack_timer_timeout"]
+[connection signal="body_entered" from="EnemyDetectionArea" to="." method="_on_enemy_detection_area_body_entered"]
+[connection signal="body_exited" from="EnemyDetectionArea" to="." method="_on_enemy_detection_area_body_exited"]
+
+[editable path="HurtBox"]
